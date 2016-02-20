@@ -1,67 +1,30 @@
-%%%-------------------------------------------------------------------
-%%% @author Schmitt
-%%% @copyright (C) 2016, <COMPANY>
-%%% @doc
-%%%
-%%% @end
-%%% Created : 12. Февр. 2016 20:58
-%%%-------------------------------------------------------------------
 -module(ftpe_server).
--author("Schmitt").
+-author("schmitt-kun").
 
--behaviour(gen_server).
+-behavior(gen_fsm).
 
-%% API
+% start link
 -export([start_link/0]).
+% Gen_fsm API.
+-export([init/1, listen_socket/2, terminate/3]).
 
-%% gen_server callbacks
--export([init/1,
-  handle_call/3,
-  handle_cast/2,
-  handle_info/2,
-  terminate/2,
-  code_change/3]).
+-type socket() :: port().
 
--define(SERVER, ?MODULE).
-
--define(PORT, 12345).
-
--record(state, {}).
-
-%%%===================================================================
-%%% API
-%%%===================================================================
-
+-spec start_link() -> {ok,pid()} | {error,any()}.
 start_link() ->
-  gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+  gen_fsm:start_link({local, ?MODULE},?MODULE, [], []).
 
-%%%===================================================================
-%%% gen_server base callbacks
-%%%===================================================================
-
+-spec init([]) -> {ok, listen_socket, socket()}.
 init([]) ->
-  io:format("i'm alive"),
-  {ok, #state{}}.
+  {ok, ListenSocket} = gen_tcp:listen(8081, {binary, {active, false}}),
+  {ok, listen_socket, ListenSocket}.
+% FSM only state.
 
-terminate(_Reason, _State) ->
-  ok.
+-spec listen_socket(_, socket()) -> {next_state, term(), socket()}.
+listen_socket(_, ListenSocket) ->
+  {ok, Socket} = gen_tcp:accept(ListenSocket),
+  {next_stete, listen_socket,ListenSocket}.
 
-code_change(_OldVsn, State, _Extra) ->
-  {ok, State}.
-
-
-%%%===================================================================
-%%% gen_server extended callbacks
-%%%===================================================================
-
-handle_call(_Request, _From, State) ->
-  {reply, ok, State}.
-
-
-handle_cast(_Request, State) ->
-  {noreply, State}.
-
-
-handle_info(_Info, State) ->
-  {noreply, State}.
-
+-spec terminate(_,_,socket()) -> ok.
+terminate(_Reason, _StateName, ListenSocket) ->
+  gen_tcp:close(ListenSocket).
