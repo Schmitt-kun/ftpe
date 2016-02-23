@@ -41,10 +41,13 @@ init([]) ->
   Shutdown = 2000,
   Type = worker,
 
-  AChild = {ftpe_server, {ftpe_server, start_link, []},
+  Ftpe_server = {ftpe_server, {ftpe_server, start_link, []},
     Restart, Shutdown, Type, [ftpe_server]},
 
-  {ok, {SupFlags, [AChild]}}.
+  Ftpe_sup = {ftpe_sup, {ftpe_sup, start_link, []},
+    Restart, Shutdown, supervisor, [ftpe_sup]},
+
+  {ok, {SupFlags, [Ftpe_server, Ftpe_sup]}}.
 
 %%%===================================================================
 %%% Internal functions

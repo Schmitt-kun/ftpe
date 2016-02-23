@@ -3,6 +3,9 @@
 
 -behavior(gen_fsm).
 
+%% Awaits connection from clients.
+%% Start ftpe_socket for each connected client.
+
 % start link
 -export([start_link/0]).
 % Gen_fsm API.
@@ -16,7 +19,7 @@ start_link() ->
 
 -spec init([]) -> {ok, listen_socket, socket()}.
 init([]) ->
-  {ok, ListenSocket} = gen_tcp:listen(8081, {binary, {active, false}}),
+  {ok, ListenSocket} = gen_tcp:listen(8081, [binary, {active, false}]),
   {ok, listen_socket, ListenSocket}.
 % FSM only state.
 
