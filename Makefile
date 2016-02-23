@@ -1,5 +1,5 @@
 all:
-	rebar compile
+	rebar clean compile
 
 run:
 	werl -name ftpe  \

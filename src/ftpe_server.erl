@@ -19,14 +19,18 @@ start_link() ->
 
 -spec init([]) -> {ok, listen_socket, socket()}.
 init([]) ->
+  io:format("Server: start.~n"),
   {ok, ListenSocket} = gen_tcp:listen(8081, [binary, {active, false}]),
-  {ok, listen_socket, ListenSocket}.
+  {ok, listen_socket, ListenSocket,0}.
 % FSM only state.
 
 -spec listen_socket(_, socket()) -> {next_state, term(), socket()}.
 listen_socket(_, ListenSocket) ->
+  io:format("Server: wait.~n"),
   {ok, Socket} = gen_tcp:accept(ListenSocket),
-  {next_stete, listen_socket,ListenSocket}.
+  io:format("Server: connection.~n"),
+  ftpe_sup:start_socket(Socket),
+  {next_state, listen_socket,ListenSocket,0}.
 
 -spec terminate(_,_,socket()) -> ok.
 terminate(_Reason, _StateName, ListenSocket) ->
