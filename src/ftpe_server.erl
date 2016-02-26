@@ -13,6 +13,8 @@
 
 -type socket() :: port().
 
+-define(PORT, 21).
+
 -spec start_link() -> {ok,pid()} | {error,any()}.
 start_link() ->
   gen_fsm:start_link({local, ?MODULE},?MODULE, [], []).
@@ -20,15 +22,15 @@ start_link() ->
 -spec init([]) -> {ok, listen_socket, socket()}.
 init([]) ->
   io:format("Server: start.~n"),
-  {ok, ListenSocket} = gen_tcp:listen(8081, [binary, {active, false}]),
+  {ok, ListenSocket} = gen_tcp:listen(?PORT, [binary, {active, false}]),
   {ok, listen_socket, ListenSocket,0}.
 % FSM only state.
 
 -spec listen_socket(_, socket()) -> {next_state, term(), socket()}.
 listen_socket(_, ListenSocket) ->
-  io:format("Server: wait.~n"),
+  io:format("  Server: listen.~n"),
   {ok, Socket} = gen_tcp:accept(ListenSocket),
-  io:format("Server: connection.~n"),
+  io:format("  Server: connection.~n"),
   ftpe_sup:start_socket(Socket),
   {next_state, listen_socket,ListenSocket,0}.
 

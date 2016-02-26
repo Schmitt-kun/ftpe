@@ -47,7 +47,10 @@ init([]) ->
   Ftpe_sup = {ftpe_sup, {ftpe_sup, start_link, []},
     Restart, Shutdown, supervisor, [ftpe_sup]},
 
-  {ok, {SupFlags, [Ftpe_server, Ftpe_sup]}}.
+  Ftpe_prop = {ftpe_properties, {ftpe_properties, start_link, []},
+    Restart, Shutdown, Type, [ftpe_properties]},
+
+  {ok, {SupFlags, [Ftpe_server, Ftpe_sup, Ftpe_prop]}}.
 
 %%%===================================================================
 %%% Internal functions

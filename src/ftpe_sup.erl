@@ -19,7 +19,7 @@ start_link() ->
 
 -spec start_socket(port()) -> ok.
 start_socket(ListenSocket)->
-  io:format("Supervisor, start child thread.~n"),
+  io:format("  Supervisor, start child thread.~n"),
   Id = erlang:unique_integer(),
   ChildSpec = {Id, {ftpe_socket, start_link, [ListenSocket]},
       permanent, 100, worker, [ftpe_socket]},
@@ -29,7 +29,7 @@ start_socket(ListenSocket)->
 %% Supervisor callbacks.
 init([])->
   RestartStrategy = one_for_one,
-  MaxRestarts = 10,
+  MaxRestarts = 3,
   MaxSecondsBetweenRestarts = 1,
 
   SupFlags = {RestartStrategy, MaxRestarts, MaxSecondsBetweenRestarts},
